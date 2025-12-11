@@ -2,7 +2,6 @@
 from fastapi import APIRouter, Request, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
-import os
 from dotenv import load_dotenv
 import time
 from collections import deque
@@ -25,7 +24,6 @@ from core.services.prompt_injection_detector import PromptInjectionDetector
 from core.services.alerts_service import AlertsService
 from core.models.log_model import LogModel, Reason
 from core.models.database import DatabaseManager
-from core.utils.alerts import play_pii_alert, play_policy_alert
 from core.config.settings_loader import load_settings
 
 # Load environment variables
@@ -457,27 +455,12 @@ async def analyze_prompt(request_data: AnalysisRequest, request: Request):
         # Alert failures should never break the analysis pipeline
         pass
     
-    # 9. Play alerts
-    if status == "Blocked":
-        if any(r["type"] == "pii" for r in reasons):
-            pii_path = settings.get("ALERT_PII_PATH", "")
-            if pii_path:
-                play_pii_alert(pii_path)
-        else:
-            policy_path = settings.get("ALERT_POLICY_PATH", "")
-            if policy_path:
-                play_policy_alert(policy_path)
-    elif status == "Flagged":
-        policy_path = settings.get("ALERT_POLICY_PATH", "")
-        if policy_path:
-            play_policy_alert(policy_path)
-    
-    # 10. Get Gemini response if safe
+    # 9. Get Gemini response if safe
     if status == "Safe" and prompt.strip():
         print(f"💡 Prompt is safe, querying Gemini...")
         gemini_response = gemini_service.get_response(prompt)
     
-    # 11. Log results
+    # 10. Log results
     log = LogModel(
         prompt=prompt,
         status=status,
@@ -501,6 +484,4 @@ async def analyze_prompt(request_data: AnalysisRequest, request: Request):
         risk_score=risk_score,
         intent=intent_result.get('intent')
     )
-
-ALERT_POLICY_PATH = settings.get("ALERT_POLICY_PATH", "")
 

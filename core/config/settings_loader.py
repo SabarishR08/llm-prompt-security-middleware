@@ -23,8 +23,6 @@ def load_settings() -> Dict[str, Any]:
     
     # Override with environment variables
     settings["GEMINI_API_KEY"] = os.getenv("GEMINI_API_KEY", "")
-    settings["ALERT_PII_PATH"] = os.getenv("ALERT_PII_PATH", "sound_alerts/PII_Alert.mp3")
-    settings["ALERT_POLICY_PATH"] = os.getenv("ALERT_POLICY_PATH", "sound_alerts/Policy-Violation_Alert.mp3")
     settings["REDIS_URL"] = os.getenv("REDIS_URL", settings.get("REDIS_URL", ""))
     settings["VIRUSTOTAL_API_KEY"] = os.getenv("VIRUSTOTAL_API_KEY", "")
     settings["IPQS_API_KEY"] = os.getenv("IPQS_API_KEY", "")

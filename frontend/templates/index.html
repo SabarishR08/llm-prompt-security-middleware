@@ -639,25 +639,6 @@
         </div>
     </div>
 
-    <!-- Audio Elements -->
-    <audio id="piiAudio" preload="auto">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="policyAudio" preload="auto">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-warning-alarm-buzzer-991.mp3" type="audio/mpeg">
-    </audio>
-    
-    <!-- Audio Controls -->
-    <div class="audio-controls">
-        <div class="audio-toggle">
-            <span>Audio Alerts:</span>
-            <label class="toggle-switch">
-                <input type="checkbox" id="audioToggle" checked>
-                <span class="slider"></span>
-            </label>
-        </div>
-    </div>
-
     <script>
         const API_BASE_URL = 'http://127.0.0.1:8000';
 
@@ -701,9 +682,6 @@
         const updateModeBtn = document.getElementById('updateModeBtn');
         const modeSelect = document.getElementById('modeSelect');
         const currentModeText = document.getElementById('currentModeText');
-        const piiAudio = document.getElementById('piiAudio');
-        const policyAudio = document.getElementById('policyAudio');
-        const audioToggle = document.getElementById('audioToggle');
         const loginModal = document.getElementById('loginModal');
         const closeLoginModalBtn = document.getElementById('closeLoginModalBtn');
         const loginForm = document.getElementById('loginForm');
@@ -717,7 +695,6 @@
         let piiTrendsChartInstance = null;
         let injectionChartInstance = null;
         let toxicityHeatmapInstance = null;
-        let audioEnabled = true;
         let isAuthenticated = false;
         let authToken = null;
         let refreshToken = null;
@@ -767,25 +744,6 @@
             }, 3000);
         }
 
-        // Audio alert function
-        function playAudioAlert(data) {
-            if (!audioEnabled) return;
-            
-            // Reset audio elements
-            piiAudio.pause();
-            piiAudio.currentTime = 0;
-            policyAudio.pause();
-            policyAudio.currentTime = 0;
-            
-            // Play appropriate audio based on status and reasons
-            if (data.status === "Flagged") {
-                policyAudio.play().catch(e => console.log("Audio play failed:", e));
-            } else if (data.reasons && data.reasons.some(r => r.type === "pii" || r.type === "toxic")) {
-                piiAudio.play().catch(e => console.log("Audio play failed:", e));
-            }
-            // Safe prompts don't play any audio
-        }
-
         submitBtn.addEventListener('click', async () => {
             const prompt = promptInput.value.trim().replace(/\s+/g, ' ');
             if (!prompt) {
@@ -818,7 +776,6 @@
                 }
 
                 displayResult(responseData);
-                playAudioAlert(responseData); // Play audio alert
                 
                 if (!logsSection.classList.contains('hidden')) {
                     fetchLogs();
@@ -1436,12 +1393,6 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        });
-
-        // Audio toggle functionality
-        audioToggle.addEventListener('change', function() {
-            audioEnabled = this.checked;
-            showToast(`Audio alerts ${audioEnabled ? 'enabled' : 'disabled'}`, 'success');
         });
 
         showCheckerBtn.addEventListener('click', () => showSection('checker'));

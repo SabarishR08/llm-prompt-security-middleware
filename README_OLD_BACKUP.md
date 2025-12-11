@@ -271,9 +271,6 @@ Prompt-Compliance-Automation/
 │
 ├── 📂 migrations/                    # Database migrations (future)
 │
-├── 📂 sound_alerts/                  # Audio alert files
-│   ├── 🔊 PII_Alert.mp3
-│   └── 🔊 Policy-Violation_Alert.mp3
 │
 ├── 📂 k8s/                           # Kubernetes manifests
 │   └── 📄 deployment.yaml            # K8s deployment spec
