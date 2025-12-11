@@ -195,10 +195,10 @@ REQUEST TIMELINE (typical: 50-200ms)
 ```
 Prompt-Compliance-Automation/
 │
-├── 📄 main.py                          # FastAPI Application Entrypoint
-├── 📄 app.py                           # Legacy Flask compatibility
-├── 📄 requirements.txt                 # Python dependencies
-├── 📄 Dockerfile                       # Docker container image
+├── 📄 main.py                         # FastAPI Application Entrypoint
+├── 📄 app.py                          # Legacy Flask compatibility
+├── 📄 requirements.txt                # Python dependencies
+├── 📄 Dockerfile                      # Docker container image
 ├── 📄 docker-compose.yml              # Multi-container orchestration
 ├── 🔐 .env                            # Environment variables (secrets)
 ├── 🔐 .env.example                    # Environment template
@@ -208,59 +208,59 @@ Prompt-Compliance-Automation/
 │
 ├── 📂 api/                            # API Layer (FastAPI routes)
 │   ├── 📄 __init__.py
-│   ├── 📂 routes/                    # API endpoint definitions
+│   ├── 📂 routes/                   # API endpoint definitions
 │   │   ├── 📄 analysis_router.py    # POST /api/analysis/analyze
 │   │   ├── 📄 logs_router.py        # GET /api/logs (RBAC protected)
 │   │   ├── 📄 auth_router.py        # POST /api/auth/login
 │   │   ├── 📄 dashboard_router.py   # GET /api/dashboard (metrics)
 │   │   ├── 📄 health_router.py      # GET /api/health, /liveness
 │   │   └── 📄 __init__.py
-│   └── 📂 dependencies/              # Dependency injection
+│   └── 📂 dependencies/             # Dependency injection
 │       ├── 📄 __init__.py
 │       └── 📄 auth.py               # JWT validation functions
 │
-├── 📂 core/                           # Core Business Logic
+├── 📂 core/                         # Core Business Logic
 │   ├── 📄 __init__.py
-│   ├── 📂 config/                   # Configuration management
+│   ├── 📂 config/                  # Configuration management
 │   │   ├── 📄 app_config.py        # Settings loader
 │   │   ├── 📄 logging_config.py    # Logging configuration
 │   │   ├── 📄 settings_loader.py   # Environment-based config
 │   │   ├── 📄 settings.json        # Static configuration
 │   │   └── 📄 __init__.py
-│   ├── 📂 middleware/               # HTTP middleware
+│   ├── 📂 middleware/              # HTTP middleware
 │   │   ├── 📄 rate_limit.py        # RateLimitMiddleware
 │   │   ├── 📄 request_id.py        # RequestIDMiddleware (trace ID)
 │   │   ├── 📄 security_headers.py  # SecurityHeadersMiddleware
 │   │   ├── 📄 performance.py       # PerformanceMiddleware (metrics)
 │   │   └── 📄 __init__.py
-│   ├── 📂 models/                   # Data models & database
+│   ├── 📂 models/                  # Data models & database
 │   │   ├── 📄 database.py          # SQLite DatabaseManager
 │   │   ├── 📄 log_model.py         # Log entry schema
 │   │   ├── 📄 validators.py        # Input validation rules
 │   │   └── 📄 __init__.py
-│   ├── 📂 services/                 # Business logic services
-│   │   ├── 📄 gemini_service.py    # LLM response generation
-│   │   ├── 📄 pii_service.py       # PII detection (Presidio)
-│   │   ├── 📄 toxicity_service.py  # Toxicity scoring (Detoxify)
-│   │   ├── 📄 profanity_service.py # Keyword filtering
-│   │   ├── 📄 prompt_injection_detector.py # Injection detection
-│   │   ├── 📄 virustotal_service.py  # VirusTotal API client
+│   ├── 📂 services/                          # Business logic services
+│   │   ├── 📄 gemini_service.py              # LLM response generation
+│   │   ├── 📄 pii_service.py                 # PII detection (Presidio)
+│   │   ├── 📄 toxicity_service.py            # Toxicity scoring (Detoxify)
+│   │   ├── 📄 profanity_service.py           # Keyword filtering
+│   │   ├── 📄 prompt_injection_detector.py   # Injection detection
+│   │   ├── 📄 virustotal_service.py          # VirusTotal API client
 │   │   ├── 📄 google_safebrowsing_service.py # GSB API client
-│   │   ├── 📄 threat_intel_service.py # OTX, URLScan clients
-│   │   ├── 📄 alerts_service.py    # Alert/notification engine
-│   │   ├── 📄 rules_service.py     # Custom rule evaluation
+│   │   ├── 📄 threat_intel_service.py        # OTX, URLScan clients
+│   │   ├── 📄 alerts_service.py              # Alert/notification engine
+│   │   ├── 📄 rules_service.py               # Custom rule evaluation
 │   │   └── 📄 __init__.py
 │   ├── 📂 security/                 # Security utilities
 │   │   └── 📄 __init__.py
-│   └── 📂 utils/                    # General utilities
+│   └── 📂 utils/                   # General utilities
 │       ├── 📄 auth.py              # JWT token handling
 │       ├── 📄 cache.py             # In-memory caching
 │       ├── 📄 exceptions.py        # Custom exceptions
 │       ├── 📄 alerts.py            # Alert helpers
 │       └── 📄 __init__.py
 │
-├── 📂 frontend/                       # Frontend assets
-│   ├── 📂 templates/                # HTML templates
+├── 📂 frontend/                    # Frontend assets
+│   ├── 📂 templates/               # HTML templates
 │   │   ├── 📄 index.html           # Landing page
 │   │   ├── 📄 dashboard.html       # Analytics dashboard
 │   │   └── 📄 auth.html            # Login page
@@ -277,12 +277,12 @@ Prompt-Compliance-Automation/
 │   └── (18+ additional guides)
 │
 ├── 📂 scripts/                       # Utility scripts
-│   ├── 📄 clear_db.py              # Clear SQLite database
-│   └── 📄 performance_report.py    # Generate performance metrics
+│   ├── 📄 clear_db.py                # Clear SQLite database
+│   └── 📄 performance_report.py      # Generate performance metrics
 │
-├── 📂 tests/                         # Test suite
+├── 📂 tests/                        # Test suite
 │   ├── 📄 test_security_features.py # Unit tests
-│   └── 📄 test_api.ps1             # PowerShell integration tests
+│   └── 📄 test_api.ps1              # PowerShell integration tests
 │
 ├── 📂 migrations/                    # Database migrations (future)
 │
@@ -291,16 +291,16 @@ Prompt-Compliance-Automation/
 │   └── 🔊 Policy-Violation_Alert.mp3
 │
 ├── 📂 k8s/                           # Kubernetes manifests
-│   └── 📄 deployment.yaml           # K8s deployment spec
+│   └── 📄 deployment.yaml            # K8s deployment spec
 │
 ├── 📂 logs/                          # Application logs
-│   └── 📄 app.log                  # FastAPI logs
+│   └── 📄 app.log                    # FastAPI logs
 │
 ├── 📂 .github/                       # GitHub configuration
 │   └── 📂 workflows/
-│       └── 📄 ci-cd.yml            # GitHub Actions pipeline
+│       └── 📄 ci-cd.yml              # GitHub Actions pipeline
 │
-└── 📂 __pycache__/                  # Python compiled files (ignored)
+└── 📂 __pycache__/                   # Python compiled files (ignored)
 ```
 
 ---
