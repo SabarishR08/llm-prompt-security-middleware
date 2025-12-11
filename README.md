@@ -785,11 +785,6 @@ Have questions or need help? Reach out!
 
 ---
 
----
-
-**Built with ❤️ for AI Safety & Compliance**
-
----
 
 ### 👨‍💻 Author
 
