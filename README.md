@@ -695,12 +695,22 @@ MIT License - See LICENSE file
 
 ## 💬 Support
 
-- **Issues:** [GitHub Issues](https://github.com/yourusername/prompt-compliance-automation/issues)
-- **Email:** support@compliance-automation.com
+- **Issues:** [GitHub Issues](https://github.com/SabarishR08/llm-prompt-security-middleware/issues)
+- **Email:** sabarish.edu2024@gmail.com
+- **LinkedIn:** [Sabarish R](https://www.linkedin.com/in/sabarishr08)
 - **Docs:** [Full documentation](docs/)
 
 ---
 
 **Built with ❤️ for AI Safety & Compliance**
 
-*Last Updated: January 2025*
+---
+
+### 👨‍💻 Author
+
+**Sabarish R**
+- 📧 Email: sabarish.edu2024@gmail.com
+- 💼 LinkedIn: [linkedin.com/in/sabarishr08](https://www.linkedin.com/in/sabarishr08)
+- 🐙 GitHub: [@SabarishR08](https://github.com/SabarishR08)
+
+*Last Updated: December 2025*
