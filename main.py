@@ -151,7 +151,7 @@ logger.info("🌐 CORS middleware configured for origins: %s", cors_origins)
 # ---------------------------------
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="templates"), name="static")
+app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 logger.info("📁 Static files mounted at /static")
 
 # Include API Routers
@@ -175,7 +175,7 @@ async def index():
         with open("frontend/templates/index.html", "r", encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
-        logger.warning("templates/index.html not found, serving fallback page")
+        logger.warning("frontend/templates/index.html not found, serving fallback page")
         return """
         <html>
             <head>
