@@ -1,153 +1,138 @@
-# 🛡️ Prompt Compliance Automation System
+# 🛡️ LLM Prompt Security Middleware
 
-**AI Safety & Compliance Gateway for Large Language Model Prompts**
+**AI Safety Gateway for Large Language Model Prompts**
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green?logo=fastapi)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
 ![Tests](https://img.shields.io/badge/Tests-20%20Passing-brightgreen)
-![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-blue)
 
-A production-grade FastAPI application that implements comprehensive security, safety, and compliance checks for LLM prompts before they reach AI models. Built for enterprises requiring multi-layered threat detection and regulatory compliance.
-
----
-
-## 📋 Table of Contents
-
-1. [Overview](#overview)
-2. [Key Features](#key-features)
-3. [Architecture](#architecture)
-4. [Folder Structure](#folder-structure)
-5. [File Documentation](#file-documentation)
-6. [API Endpoints](#api-endpoints)
-7. [RBAC System](#rbac-system)
-8. [Security Features](#security-features)
-9. [Installation](#installation)
-10. [Running Locally](#running-locally)
-11. [Docker Deployment](#docker-deployment)
-12. [Environment Variables](#environment-variables)
-13. [Database Schema](#database-schema)
-14. [Performance & Monitoring](#performance--monitoring)
+A security middleware for LLM applications that analyzes prompts for **PII**, **toxicity**, **prompt injection**, and other threats before reaching AI models.
 
 ---
 
-## 🎯 Overview
+## 🎯 What It Does
 
-The **Prompt Compliance Automation System** is a sophisticated security middleware designed to:
+This middleware sits between users and LLMs, scanning every prompt for:
 
-- **Scan incoming prompts** for PII, toxicity, and prompt injection attacks
-- **Verify threats** against global intelligence feeds (VirusTotal, Google Safe Browsing, OTX)
-- **Enforce compliance** through customizable rules and policies
-- **Generate safe responses** via Gemini API with content filtering
-- **Track & audit** all requests with RBAC-controlled logging
-- **Monitor performance** with real-time dashboards and alerting
+- **PII (Personally Identifiable Information)** - Names, emails, phone numbers, SSNs, credit cards
+- **Toxic Content** - Hate speech, threats, insults, obscenity
+- **Prompt Injection** - SQL injection, command injection, jailbreak attempts
+- **Profanity & Blocked Keywords** - Configurable word lists
+- **Malicious URLs** - Via VirusTotal, Google Safe Browsing, OTX
 
-This system acts as a **safety gate** between user inputs and LLM models, ensuring only compliant, safe prompts are processed.
-
----
-
-## ✨ Key Features
-
-### 🔍 PII Detection
-- Uses **Presidio** framework to detect Personally Identifiable Information
-- Identifies: names, email addresses, phone numbers, SSN, credit cards, IP addresses
-- Applies pattern recognition and NER (Named Entity Recognition)
-- Allows configurable PII detection thresholds
-- **Status**: ✅ Production Ready
-
-### 😤 Toxicity Detection
-- Implements **Detoxify** model for toxicity scoring
-- Detects: hate speech, identity attacks, insults, threats, obscenity
-- Returns severity scores (0.0-1.0) for each toxicity class
-- Blocks prompts exceeding configurable toxicity thresholds
-- **Status**: ✅ Production Ready
-
-### 💉 Prompt Injection Detection
-- Advanced pattern matching for SQL injection attempts
-- Detects command injection, prompt manipulation vectors
-- Uses regex-based and heuristic approaches
-- Prevents malicious prompt manipulation
-- **Status**: ✅ Advanced Detection
-
-### 🗣️ Profanity & Blocked Keyword Detection
-- Comprehensive dictionary of profane and blocked terms
-- Case-insensitive matching with fuzzy string similarity
-- Configurable word lists per organization
-- Returns matched keywords for audit trails
-- **Status**: ✅ Configurable
-
-### 📏 Prompt Length Enforcement
-- Enforces minimum/maximum prompt length policies
-- Prevents token-stuffing attacks
-- Configurable per endpoint
-- Logs attempts to exceed limits
-- **Status**: ✅ Enabled
-
-### 🌐 Threat Intelligence Checks
-Integration with multiple threat intelligence providers:
-
-| Provider | Use Case | Status |
-|----------|----------|--------|
-| **VirusTotal** | Domain/URL reputation scoring | ✅ Active |
-| **Google Safe Browsing** | Malware & phishing detection | ✅ Active |
-| **OTX (Alien Vault)** | Malicious IP/domain tracking | ✅ Active |
-| **URLScan.io** | URL behavior analysis | ✅ Active |
-
-### 👥 Role-Based Access Control (RBAC)
-- **Admin**: Full access to all logs, configuration, dashboards
-- **Moderator**: View logs, approve/reject flagged prompts
-- **User**: Submit prompts (read-only)
-- Fine-grained permission model with attribute-based controls
-- JWT token-based authentication
-- **Status**: ✅ Fully Implemented
-
-### 📊 Logging & Audit Trail
-- SQLite database with complete request/response logging
-- Stores: timestamp, user_id, role, prompt, analysis_results, gemini_response
-- Searchable logs with filtering by severity, category, user
-- Compliance-ready audit logs for regulatory reporting
-- **Status**: ✅ Enterprise Grade
-
-### 📈 Dashboards & Analytics
-- Real-time security metrics dashboard
-- Risk heatmaps by detection category
-- Trends over time (daily/weekly/monthly)
-- User activity analytics
-- Export capabilities (CSV, JSON)
-- **Status**: ✅ Interactive
-
-### 🤖 Gemini API Integration
-- Sends **safe prompts** to Google Gemini for response generation
-- Includes compliance context in system prompt
-- Caches responses for performance
-- Fallback handling for API failures
-- **Status**: ✅ Integrated
-
-### 🔔 Alerts & Notifications
-- Real-time alerts for high-severity threats
-- Audio alerts (MP3 files) for critical violations
-- Email notifications (configurable)
-- Webhook support for external SIEM systems
-- **Status**: ✅ Multi-Channel
+Only safe, compliant prompts reach the LLM. Everything is logged for audit trails.
 
 ---
 
-## 🏗️ Architecture
+## ✨ Core Features
 
-The system implements a **layered security approach** with multiple validation stages before prompts reach LLMs.
+| Feature | Description | Status |
+|---------|-------------|--------|
+| 🔍 **PII Detection** | Presidio-based NER for sensitive data | ✅ Active |
+| 😤 **Toxicity Scoring** | Detoxify ML model (0.0-1.0 scores) | ✅ Active |
+| 💉 **Injection Prevention** | Regex + heuristics for attacks | ✅ Active |
+| 🌐 **Threat Intelligence** | VirusTotal, GSB, OTX integration | ✅ Active |
+| 👥 **RBAC** | Admin, Moderator, User roles (JWT) | ✅ Active |
+| 📝 **Audit Logging** | SQLite DB with full request tracking | ✅ Active |
+| 🤖 **LLM Integration** | Google Gemini API with safety filters | ✅ Active |
 
-### 📊 Data Flow Pipeline
+---
 
-```mermaid
-graph TD
-    A["👤 USER SUBMISSION<br/>(Prompt + Metadata)"] --> B["🔐 AUTHENTICATION LAYER<br/>(JWT Token Validation)"]
-    B --> C["🛡️ COMPLIANCE ENGINE"]
-    C --> C1["🔍 PII Detection<br/>(Presidio)"]
-    C --> C2["😤 Toxicity Scoring<br/>(Detoxify)"]
-    C --> C3["💉 Injection Detection<br/>(Regex + ML)"]
-    C --> C4["🗣️ Profanity Check<br/>(Dictionary)"]
-    C1 --> D["🌐 THREAT INTELLIGENCE<br/>(VirusTotal, GSB, OTX)"]
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.10+
+- pip
+
+### Installation
+
+```bash
+# Clone repository
+git clone https://github.com/SabarishR08/llm-prompt-security-middleware.git
+cd llm-prompt-security-middleware
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Download ML models
+python -m spacy download en_core_web_sm
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your API keys
+
+# Initialize database
+python -c "from core.models.database import DatabaseManager; DatabaseManager('logs.db').init_db()"
+```
+
+### Run
+
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Access at:
+- 🏠 **Web UI**: http://localhost:8000
+- 📚 **API Docs**: http://localhost:8000/docs
+
+---
+
+## 📊 How It Works
+
+```
+┌─────────────────┐
+│  User Prompt    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Authentication  │ ← JWT Token Validation
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────────────────────────┐
+│       Compliance Checks             │
+│  ┌──────────┐  ┌──────────┐        │
+│  │   PII    │  │ Toxicity │        │
+│  │Detection │  │ Scoring  │        │
+│  └──────────┘  └──────────┘        │
+│  ┌──────────┐  ┌──────────┐        │
+│  │Injection │  │Profanity │        │
+│  │Detection │  │  Check   │        │
+│  └──────────┘  └──────────┘        │
+└────────┬────────────────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│Threat Intel APIs│ ← VirusTotal, GSB, OTX
+└────────┬────────┘
+         │
+         ▼
+    ┌────┴────┐
+    │         │
+  PASS      BLOCK
+    │         │
+    ▼         ▼
+┌────────┐ ┌──────┐
+│ Gemini │ │ Error│
+│  API   │ │ 403  │
+└────────┘ └──────┘
+    │         │
+    └────┬────┘
+         ▼
+   ┌──────────┐
+   │Audit Log │
+   └──────────┘
+```
+
+> **Detailed architecture diagrams**: See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+
+---
     C2 --> D
     C3 --> D
     C4 --> D
