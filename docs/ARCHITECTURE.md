@@ -3,23 +3,17 @@
 ## High-Level Architecture
 
 ```mermaid
-flowchart LR
-       A[External Clients] -->|HTTPS (TLS 1.2+)| B[NGINX / Ingress<br/>TLS + Rate Limit]
-       B -->|Round robin| C[FastAPI App Pods<br/>Gunicorn workers]
-       C -->|Cache| D[Redis / Cache]
-       C -->|Logs + Analytics| E[PostgreSQL / Logs]
-       C -->|Reputation checks| F[Threat Intel APIs]
-       C -->|Safe responses| G[Gemini LLM]
-       C -->|Metrics| H[Monitoring & Logging]
-
-       style A fill:#f4f7ff,stroke:#4f46e5,stroke-width:1px
-       style B fill:#eef2ff,stroke:#4338ca,stroke-width:1px
-       style C fill:#ecfdf3,stroke:#15803d,stroke-width:1px
-       style D fill:#fff7ed,stroke:#ea580c,stroke-width:1px
-       style E fill:#fff7ed,stroke:#ea580c,stroke-width:1px
-       style F fill:#fef2f2,stroke:#b91c1c,stroke-width:1px
-       style G fill:#f0f9ff,stroke:#0ea5e9,stroke-width:1px
-       style H fill:#f8fafc,stroke:#0f172a,stroke-width:1px
+flowchart TD
+       A[User Prompt] --> B[JWT Auth]
+       B --> C[Compliance Checks<br/>PII, Toxicity, Injection, Profanity]
+       C --> D[Threat Intel APIs<br/>VirusTotal, GSB, OTX]
+       D --> E{Decision}
+       E -->|Pass| F[Gemini API<br/>Safe Response]
+       E -->|Block| G[Return 403<br/>+ reason]
+       E -->|Flag| H[Review Queue]
+       F --> I[Audit Log]
+       G --> I
+       H --> I
 ```
 
 ```
