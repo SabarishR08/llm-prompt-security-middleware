@@ -333,6 +333,4 @@ MIT License - See [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ for AI Safety**
-
 *Last Updated: December 2025*
