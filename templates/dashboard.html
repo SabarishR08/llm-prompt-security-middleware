@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Prompt Compliance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-darker: #020617;
+            --bg-card: #1e293b;
+            --accent-teal: #14b8a6;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
+            font-family: 'Inter', sans-serif;
+            color: #e2e8f0;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #1a2332 0%, #0f172a 100%);
+            border-right: 1px solid #334155;
+            min-height: 100vh;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem;
+            border-radius: 0.5rem;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(20, 184, 166, 0.1);
+            color: var(--accent-teal);
+        }
+
+        .nav-item.active {
+            background-color: rgba(20, 184, 166, 0.2);
+            color: var(--accent-teal);
+            border-left: 3px solid var(--accent-teal);
+        }
+
+        .nav-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .lock-icon {
+            display: inline-block;
+            margin-left: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .content-panel {
+            display: none;
+        }
+
+        .content-panel.active {
+            display: block;
+        }
+
+        .permission-denied {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 p-4">
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">
+                    📊 Dashboard
+                </h1>
+                <p id="userGreeting" class="text-xs text-slate-400 mt-1"></p>
+            </div>
+
+            <nav class="space-y-1">
+                <!-- Home -->
+                <div class="nav-item active" data-panel="home">
+                    <span>🏠 Home</span>
+                </div>
+
+                <!-- Logs (Admin, Moderator, Analyst only) -->
+                <div class="nav-item" data-panel="logs" data-permission="view_logs">
+                    <span>📋 Logs</span>
+                    <span class="lock-icon" id="logsLock" style="display: none;">🔒</span>
+                </div>
+
+                <!-- Analytics (Admin, Moderator, Analyst only) -->
+                <div class="nav-item" data-panel="analytics" data-permission="view_analytics">
+                    <span>📈 Analytics</span>
+                    <span class="lock-icon" id="analyticsLock" style="display: none;">🔒</span>
+                </div>
+
+                <!-- Settings (Admin only) -->
+                <div class="nav-item" data-panel="settings" data-permission="change_settings">
+                    <span>⚙️ Settings</span>
+                    <span class="lock-icon" id="settingsLock" style="display: none;">🔒</span>
+                </div>
+
+                <!-- User Management (Admin only) -->
+                <div class="nav-item" data-panel="users" data-permission="manage_users">
+                    <span>👥 Users</span>
+                    <span class="lock-icon" id="usersLock" style="display: none;">🔒</span>
+                </div>
+
+                <!-- Logout -->
+                <div class="mt-8 pt-4 border-t border-slate-700">
+                    <div class="nav-item" id="logoutBtn">
+                        <span>🚪 Logout</span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-6 overflow-auto">
+            <!-- Home Panel -->
+            <div id="home" class="content-panel active">
+                <div class="max-w-4xl">
+                    <h2 class="text-3xl font-bold mb-2">Welcome to Prompt Compliance System</h2>
+                    <p class="text-slate-400 mb-6">Role-Based Access Control Demo</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                            <h3 class="font-bold text-teal-400 mb-2">👤 Your Profile</h3>
+                            <p class="text-sm text-slate-300 mb-2"><strong>Username:</strong> <span id="displayUsername">-</span></p>
+                            <p class="text-sm text-slate-300 mb-2"><strong>Role:</strong> <span id="displayRole">-</span></p>
+                            <p class="text-sm text-slate-300"><strong>Permissions:</strong> <span id="displayPerms">-</span></p>
+                        </div>
+
+                        <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                            <h3 class="font-bold text-teal-400 mb-2">📋 Available Features</h3>
+                            <ul id="featuresList" class="text-sm text-slate-300 space-y-1"></ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-900 bg-opacity-20 border border-blue-700 border-opacity-30 p-4 rounded-lg">
+                        <p class="text-sm text-blue-300">
+                            <strong>ℹ️ This is a role-based access control demo.</strong> Your permissions are determined by your role. 
+                            Try logging in with different credentials to see different access levels.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Panel -->
+            <div id="logs" class="content-panel">
+                <h2 class="text-3xl font-bold mb-4">📋 Compliance Logs</h2>
+                <div id="logsContent"></div>
+            </div>
+
+            <!-- Analytics Panel -->
+            <div id="analytics" class="content-panel">
+                <h2 class="text-3xl font-bold mb-4">📈 Analytics</h2>
+                <div id="analyticsContent"></div>
+            </div>
+
+            <!-- Settings Panel -->
+            <div id="settings" class="content-panel">
+                <h2 class="text-3xl font-bold mb-4">⚙️ System Settings</h2>
+                <div id="settingsContent"></div>
+            </div>
+
+            <!-- Users Panel -->
+            <div id="users" class="content-panel">
+                <h2 class="text-3xl font-bold mb-4">👥 User Management</h2>
+                <div id="usersContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        let userPermissions = [];
+        let userRole = '';
+
+        // Initialize dashboard
+        async function initDashboard() {
+            const username = localStorage.getItem('username');
+            const role = localStorage.getItem('user_role');
+
+            if (!username || !role) {
+                window.location.href = '/auth.html';
+                return;
+            }
+
+            userRole = role;
+            document.getElementById('displayUsername').textContent = username;
+            document.getElementById('displayRole').textContent = role.toUpperCase();
+            document.getElementById('userGreeting').textContent = `Logged in as ${username} (${role})`;
+
+            // Check permissions
+            await checkPermissions();
+            updateNavigation();
+            loadPanelContent('home');
+        }
+
+        async function checkPermissions() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/verify`, {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    userPermissions = data.permissions || [];
+                    
+                    // Display permissions
+                    const permList = userPermissions.length > 0 
+                        ? userPermissions.join(', ').replace(/_/g, ' ').toUpperCase()
+                        : 'None';
+                    document.getElementById('displayPerms').textContent = permList;
+
+                    // Update features list
+                    updateFeaturesList();
+                }
+            } catch (error) {
+                console.error('Error checking permissions:', error);
+            }
+        }
+
+        function updateFeaturesList() {
+            const features = {
+                'view_logs': '📋 View Compliance Logs',
+                'clear_logs': '🗑️ Clear Logs',
+                'export_logs': '📥 Export Logs',
+                'view_settings': '👁️ View Settings',
+                'change_settings': '✏️ Modify Settings',
+                'manage_users': '👥 Manage Users',
+                'view_analytics': '📈 View Analytics',
+            };
+
+            const list = document.getElementById('featuresList');
+            if (list) {
+                list.innerHTML = Object.entries(features)
+                    .filter(([perm, _]) => userPermissions.includes(perm))
+                    .map(([_, feature]) => `<li>✓ ${feature}</li>`)
+                    .join('');
+            }
+        }
+
+        function updateNavigation() {
+            const navItems = document.querySelectorAll('[data-permission]');
+            
+            navItems.forEach(item => {
+                const permission = item.getAttribute('data-permission');
+                const hasPermission = userPermissions.includes(permission);
+
+                if (!hasPermission) {
+                    item.classList.add('locked');
+                    item.style.pointerEvents = 'none';
+                    item.style.opacity = '0.5';
+                    
+                    const lockIcon = item.querySelector('.lock-icon');
+                    if (lockIcon) {
+                        lockIcon.style.display = 'inline';
+                    }
+                }
+            });
+        }
+
+        function loadPanelContent(panelName) {
+            // Hide all panels
+            document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            // Show selected panel
+            const panel = document.getElementById(panelName);
+            if (panel) {
+                panel.classList.add('active');
+                
+                // Mark nav item as active
+                const navItem = document.querySelector(`[data-panel="${panelName}"]`);
+                if (navItem) navItem.classList.add('active');
+            }
+
+            // Load specific content
+            switch(panelName) {
+                case 'logs':
+                    loadLogsContent();
+                    break;
+                case 'analytics':
+                    loadAnalyticsContent();
+                    break;
+                case 'settings':
+                    loadSettingsContent();
+                    break;
+                case 'users':
+                    loadUsersContent();
+                    break;
+            }
+        }
+
+        async function loadLogsContent() {
+            const content = document.getElementById('logsContent');
+            const hasPermission = userPermissions.includes('view_logs');
+
+            if (!hasPermission) {
+                content.innerHTML = '<div class="permission-denied">🔒 You do not have permission to view logs.</div>';
+                return;
+            }
+
+            content.innerHTML = '<p class="text-slate-400">Loading logs...</p>';
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/logs/`, { credentials: 'include' });
+
+                if (res.status === 401 || res.status === 403) {
+                    content.innerHTML = '<div class="permission-denied">🔒 Access denied. Admin/Moderator only.</div>';
+                    return;
+                }
+
+                if (!res.ok) throw new Error('Failed to fetch logs');
+                const data = await res.json();
+                const logs = data.logs || [];
+
+                if (!logs.length) {
+                    content.innerHTML = '<div class="text-slate-400">No logs yet.</div>';
+                    return;
+                }
+
+                const rows = logs.map(log => `
+                    <tr class="border-b border-slate-700">
+                        <td class="py-2 px-3 text-sm text-slate-300">${log.id}</td>
+                        <td class="py-2 px-3 text-sm text-slate-100">${log.prompt || ''}</td>
+                        <td class="py-2 px-3 text-sm font-semibold ${log.status === 'Blocked' ? 'text-red-400' : log.status === 'Flagged' ? 'text-amber-300' : 'text-green-300'}">${log.status}</td>
+                        <td class="py-2 px-3 text-xs text-slate-400">${(log.reasons || []).map(r => r.message).join(' • ')}</td>
+                        <td class="py-2 px-3 text-xs text-slate-500 whitespace-nowrap">${log.timestamp || ''}</td>
+                    </tr>
+                `).join('');
+
+                content.innerHTML = `
+                    <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 overflow-auto">
+                        <table class="min-w-full text-left">
+                            <thead>
+                                <tr class="text-slate-400 text-xs uppercase tracking-wider">
+                                    <th class="py-2 px-3">ID</th>
+                                    <th class="py-2 px-3">Prompt</th>
+                                    <th class="py-2 px-3">Status</th>
+                                    <th class="py-2 px-3">Reasons</th>
+                                    <th class="py-2 px-3">Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (err) {
+                console.error('Failed to load logs', err);
+                content.innerHTML = '<div class="permission-denied">⚠️ Failed to load logs. Please try again.</div>';
+            }
+        }
+
+        function loadAnalyticsContent() {
+            const content = document.getElementById('analyticsContent');
+            const hasPermission = userPermissions.includes('view_analytics');
+
+            if (!hasPermission) {
+                content.innerHTML = '<div class="permission-denied">🔒 You do not have permission to view analytics.</div>';
+                return;
+            }
+
+            content.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                        <h3 class="text-amber-400 font-bold mb-2">⚠️ Flagged</h3>
+                        <p class="text-3xl font-bold">0</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                        <h3 class="text-red-400 font-bold mb-2">🚫 Blocked</h3>
+                        <p class="text-3xl font-bold">0</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                        <h3 class="text-green-400 font-bold mb-2">✓ Safe</h3>
+                        <p class="text-3xl font-bold">0</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadSettingsContent() {
+            const content = document.getElementById('settingsContent');
+            const hasPermission = userPermissions.includes('change_settings');
+
+            if (!hasPermission) {
+                content.innerHTML = '<div class="permission-denied">🔒 You do not have permission to modify settings.</div>';
+                return;
+            }
+
+            content.innerHTML = `
+                <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                    <p class="text-slate-400">⚙️ System settings would be displayed here.</p>
+                    <p class="text-slate-500 text-sm mt-2">Features: Configure thresholds, rules, alerts</p>
+                </div>
+            `;
+        }
+
+        function loadUsersContent() {
+            const content = document.getElementById('usersContent');
+            const hasPermission = userPermissions.includes('manage_users');
+
+            if (!hasPermission) {
+                content.innerHTML = '<div class="permission-denied">🔒 You do not have permission to manage users.</div>';
+                return;
+            }
+
+            content.innerHTML = `
+                <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                    <p class="text-slate-400">👥 User management would be displayed here.</p>
+                    <p class="text-slate-500 text-sm mt-2">Features: Add users, assign roles, manage permissions</p>
+                </div>
+            `;
+        }
+
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const panelName = item.getAttribute('data-panel');
+                if (panelName && !item.classList.contains('locked')) {
+                    loadPanelContent(panelName);
+                }
+            });
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            localStorage.removeItem('username');
+            localStorage.removeItem('user_role');
+            window.location.href = '/auth.html';
+        });
+
+        // Initialize
+        initDashboard();
+    </script>
+
+</body>
+</html>

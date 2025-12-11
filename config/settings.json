@@ -1,0 +1,32 @@
+{
+  "toxicity_thresholds": {
+    "toxicity": 0.5,
+    "severe_toxicity": 0.5,
+    "obscene": 0.5,
+    "threat": 0.5,
+    "insult": 0.5,
+    "identity_attack": 0.5
+  },
+  "flagged_keywords": [
+    "confidential",
+    "secret",
+    "private data",
+    "internal use",
+    "restricted",
+    "proprietary"
+  ],
+  "blocked_keywords": [
+    "password",
+    "ssn",
+    "social security number",
+    "credit card",
+    "token",
+    "api key",
+    "private key",
+    "secret key"
+  ],
+  "max_prompt_length": 512,
+  "max_payload_size": 10240,
+  "database_url": "sqlite:///logs.db",
+  "log_retention_days": 30
+}

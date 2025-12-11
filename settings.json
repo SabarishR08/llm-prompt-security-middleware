@@ -1,0 +1,49 @@
+﻿{
+  "toxicity_thresholds": {
+    "toxicity": 0.3,
+    "severe_toxicity": 0.2,
+    "obscene": 0.3,
+    "threat": 0.2,
+    "insult": 0.3,
+    "identity_attack": 0.2
+  },
+  "flagged_keywords": [
+    "confidential",
+    "secret",
+    "internal use",
+    "demo",
+    "prototype",
+    "test"
+  ],
+  "blocked_keywords": [
+    "password",
+    "passkey",
+    "passcode",
+    "ssn",
+    "credit card",
+    "social security number",
+    "token",
+    "api key"
+  ],
+  "max_prompt_length": 5000,
+  "max_prompt_tokens": 2000,
+  "max_payload_size": 10240,
+  "suggested_prompt_template": "Could you provide a safe version without personal info?",
+  "alert_level": "high",
+  "virustotal_api_key": "",
+  "google_safebrowsing_api_key": "",
+  "abuseipdb_api_key": "",
+  "smtp_host": "",
+  "smtp_port": 587,
+  "smtp_username": "",
+  "smtp_password": "",
+  "smtp_from_email": "",
+  "smtp_to_email": "",
+  "sendgrid_api_key": "",
+  "sendgrid_from_email": "",
+  "sendgrid_to_email": "",
+  "twilio_account_sid": "",
+  "twilio_auth_token": "",
+  "twilio_from_number": "",
+  "twilio_to_number": ""
+}
