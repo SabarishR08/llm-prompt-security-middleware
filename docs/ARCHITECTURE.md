@@ -4,13 +4,14 @@
 
 ```mermaid
 flowchart LR
-       A[External Clients] --> B[NGINX / Ingress\nTLS + Rate Limit]
-       B --> C[FastAPI App Pods\nGunicorn workers]
-       C --> D[Redis / Cache]
-       C --> E[PostgreSQL / Logs]
-       C --> F[Threat Intel APIs]
-       C --> G[Gemini LLM]
-       C --> H[Monitoring & Logging]\n
+       A[External Clients] -->|HTTPS (TLS 1.2+)| B[NGINX / Ingress<br/>TLS + Rate Limit]
+       B -->|Round robin| C[FastAPI App Pods<br/>Gunicorn workers]
+       C -->|Cache| D[Redis / Cache]
+       C -->|Logs + Analytics| E[PostgreSQL / Logs]
+       C -->|Reputation checks| F[Threat Intel APIs]
+       C -->|Safe responses| G[Gemini LLM]
+       C -->|Metrics| H[Monitoring & Logging]
+
        style A fill:#f4f7ff,stroke:#4f46e5,stroke-width:1px
        style B fill:#eef2ff,stroke:#4338ca,stroke-width:1px
        style C fill:#ecfdf3,stroke:#15803d,stroke-width:1px

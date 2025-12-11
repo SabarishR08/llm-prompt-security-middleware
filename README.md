@@ -87,8 +87,8 @@ Access at:
 ```mermaid
 flowchart TD
     A[User Prompt] --> B[JWT Auth]
-    B --> C[Compliance Checks\nPII | Toxicity | Injection | Profanity]
-    C --> D[Threat Intel APIs\nVirusTotal | GSB | OTX]
+    B --> C[Compliance Checks<br/>PII, Toxicity, Injection, Profanity]
+    C --> D[Threat Intel APIs<br/>VirusTotal, GSB, OTX]
     D --> E{Decision}
     E -->|Pass| F[Gemini API\nSafe Response]
     E -->|Block| G[Return 403\n+ reason]
