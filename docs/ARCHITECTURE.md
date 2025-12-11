@@ -2,6 +2,25 @@
 
 ## High-Level Architecture
 
+```mermaid
+flowchart LR
+       A[External Clients] --> B[NGINX / Ingress\nTLS + Rate Limit]
+       B --> C[FastAPI App Pods\nGunicorn workers]
+       C --> D[Redis / Cache]
+       C --> E[PostgreSQL / Logs]
+       C --> F[Threat Intel APIs]
+       C --> G[Gemini LLM]
+       C --> H[Monitoring & Logging]\n
+       style A fill:#f4f7ff,stroke:#4f46e5,stroke-width:1px
+       style B fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+       style C fill:#ecfdf3,stroke:#15803d,stroke-width:1px
+       style D fill:#fff7ed,stroke:#ea580c,stroke-width:1px
+       style E fill:#fff7ed,stroke:#ea580c,stroke-width:1px
+       style F fill:#fef2f2,stroke:#b91c1c,stroke-width:1px
+       style G fill:#f0f9ff,stroke:#0ea5e9,stroke-width:1px
+       style H fill:#f8fafc,stroke:#0f172a,stroke-width:1px
+```
+
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                           EXTERNAL CLIENTS                          │

@@ -84,53 +84,21 @@ Access at:
 
 ## 📊 How It Works
 
-```
-┌─────────────────┐
-│  User Prompt    │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Authentication  │ ← JWT Token Validation
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────────────────────┐
-│       Compliance Checks             │
-│  ┌──────────┐  ┌──────────┐        │
-│  │   PII    │  │ Toxicity │        │
-│  │Detection │  │ Scoring  │        │
-│  └──────────┘  └──────────┘        │
-│  ┌──────────┐  ┌──────────┐        │
-│  │Injection │  │Profanity │        │
-│  │Detection │  │  Check   │        │
-│  └──────────┘  └──────────┘        │
-└────────┬────────────────────────────┘
-         │
-         ▼
-┌─────────────────┐
-│Threat Intel APIs│ ← VirusTotal, GSB, OTX
-└────────┬────────┘
-         │
-         ▼
-    ┌────┴────┐
-    │         │
-  PASS      BLOCK
-    │         │
-    ▼         ▼
-┌────────┐ ┌──────┐
-│ Gemini │ │ Error│
-│  API   │ │ 403  │
-└────────┘ └──────┘
-    │         │
-    └────┬────┘
-         ▼
-   ┌──────────┐
-   │Audit Log │
-   └──────────┘
+```mermaid
+flowchart TD
+    A[User Prompt] --> B[JWT Auth]
+    B --> C[Compliance Checks\nPII | Toxicity | Injection | Profanity]
+    C --> D[Threat Intel APIs\nVirusTotal | GSB | OTX]
+    D --> E{Decision}
+    E -->|Pass| F[Gemini API\nSafe Response]
+    E -->|Block| G[Return 403\n+ reason]
+    E -->|Flag| H[Review Queue]
+    F --> I[Audit Log]
+    G --> I
+    H --> I
 ```
 
-> **Detailed architecture diagrams**: See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+> **More diagrams**: See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
 ---
 
