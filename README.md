@@ -295,7 +295,6 @@ MIT License - See [LICENSE](LICENSE) file
 **Sabarish R**
 - 📧 Email: sabarish.edu2024@gmail.com
 - 💼 LinkedIn: [linkedin.com/in/sabarishr08](https://www.linkedin.com/in/sabarishr08)
-- 🐙 GitHub: [@SabarishR08](https://github.com/SabarishR08)
 
 **Issues**: [GitHub Issues](https://github.com/SabarishR08/llm-prompt-security-middleware/issues)
 
