@@ -190,30 +190,39 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
+    - name: Check deployment configuration
+      id: check_config
+      run: |
+        if [ -n "${{ secrets.KUBECONFIG }}" ]; then
+          echo "config_available=true" >> $GITHUB_OUTPUT
+        else
+          echo "config_available=false" >> $GITHUB_OUTPUT
+        fi
+    
     - name: Set up kubectl
-      if: secrets.KUBECONFIG != ''
+      if: steps.check_config.outputs.config_available == 'true'
       uses: azure/setup-kubectl@v3
     
     - name: Configure kubectl
-      if: secrets.KUBECONFIG != ''
+      if: steps.check_config.outputs.config_available == 'true'
       run: |
         echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
         echo "KUBECONFIG=$(pwd)/kubeconfig.yaml" >> $GITHUB_ENV
     
     - name: Deploy to Kubernetes
-      if: secrets.KUBECONFIG != ''
+      if: steps.check_config.outputs.config_available == 'true'
       run: |
         kubectl apply -f k8s/
         kubectl rollout status deployment/ai-security-app -n ai-security
     
     - name: Verify deployment
-      if: secrets.KUBECONFIG != ''
+      if: steps.check_config.outputs.config_available == 'true'
       run: |
         kubectl get pods -n ai-security
         kubectl get services -n ai-security
     
     - name: Run smoke tests
-      if: secrets.KUBECONFIG != ''
+      if: steps.check_config.outputs.config_available == 'true'
       run: |
         # Wait for deployment to be ready
         sleep 30
@@ -221,7 +230,7 @@ jobs:
         curl -f https://yourdomain.com/health/live || exit 1
     
     - name: Skip deployment (secrets not configured)
-      if: secrets.KUBECONFIG == ''
+      if: steps.check_config.outputs.config_available == 'false'
       run: |
         echo "Skipping deployment - KUBECONFIG secret not configured"
         echo "Please add KUBECONFIG secret to deploy to Kubernetes"
