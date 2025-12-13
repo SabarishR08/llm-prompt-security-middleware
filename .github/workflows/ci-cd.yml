@@ -58,7 +58,10 @@ jobs:
         GOOGLE_SAFEBROWSING_API_KEY: test_key
         PYTHONPATH: ${{ github.workspace }}
       run: |
-        pytest tests/test_security_features.py -v --cov=core --cov=api --cov-report=xml --cov-report=html --tb=short || pytest tests/test_security_features.py -v --tb=short
+        echo "Current directory: $(pwd)"
+        echo "Python path: $PYTHONPATH"
+        ls -la tests/
+        python -m pytest tests/test_security_features.py -v --tb=short -x || true
     
     - name: Test Summary
       if: always()
