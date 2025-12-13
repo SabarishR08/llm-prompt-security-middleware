@@ -15,41 +15,40 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pytest pytest-cov pytest-asyncio
-    
+
     - name: Download spacy model
       run: |
         python -m spacy download en_core_web_sm || echo "Spacy model download skipped"
-    
+
     - name: Verify Python environment
       run: |
         python --version
         pip list
         echo "PYTHONPATH: $PYTHONPATH"
         ls -la
-    
+
     - name: Run linting
       continue-on-error: true
       run: |
         pip install flake8 black
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         black --check . --diff || true
-    
+
     - name: Run tests with coverage
       env:
         ENVIRONMENT: testing
@@ -61,14 +60,14 @@ jobs:
         echo "Current directory: $(pwd)"
         echo "Python path: $PYTHONPATH"
         ls -la tests/
-        python -m pytest tests/test_security_features.py -v --tb=short -x || true
-    
+        python -m pytest tests/test_security_features.py -v --tb=short -x
+
     - name: Test Summary
       if: always()
       run: |
         echo "### Test Results :test_tube:" >> $GITHUB_STEP_SUMMARY
         echo "Tests completed. Check logs for details." >> $GITHUB_STEP_SUMMARY
-    
+
     - name: Upload coverage reports
       continue-on-error: true
       uses: codecov/codecov-action@v3
@@ -81,16 +80,19 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-    
+
     - name: Run Trivy vulnerability scanner
       continue-on-error: true
       uses: aquasecurity/trivy-action@master
@@ -100,20 +102,20 @@ jobs:
         format: 'sarif'
         output: 'trivy-results.sarif'
         exit-code: '0'
-    
+
     - name: Upload Trivy results to GitHub Security
       continue-on-error: true
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       if: always()
       with:
         sarif_file: 'trivy-results.sarif'
-    
+
     - name: Run Bandit security scan
       continue-on-error: true
       run: |
         pip install bandit
         bandit -r . -f json -o bandit-report.json -ll || true
-    
+
     - name: Display Bandit results
       continue-on-error: true
       run: |
@@ -121,7 +123,7 @@ jobs:
           echo "Bandit scan completed"
           cat bandit-report.json | head -50
         fi
-    
+
     - name: Upload security artifacts
       continue-on-error: true
       uses: actions/upload-artifact@v4
@@ -135,27 +137,25 @@ jobs:
     name: Build Docker Image
     runs-on: ubuntu-latest
     needs: [test]
-    if: github.event_name == 'push' && (needs.test.result == 'success' || needs.test.result == 'skipped')
+    if: github.event_name == 'push' && needs.test.result == 'success'
     continue-on-error: false
-    
     permissions:
       contents: read
       packages: write
-    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-    
+
     - name: Log in to Container Registry
       uses: docker/login-action@v3
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    
+
     - name: Extract metadata
       id: meta
       uses: docker/metadata-action@v5
@@ -166,7 +166,7 @@ jobs:
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
           type=sha,prefix={{branch}}-
-    
+
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
@@ -185,11 +185,10 @@ jobs:
     if: github.ref == 'refs/heads/main'
     environment: production
     continue-on-error: true
-    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+
     - name: Check deployment configuration
       id: check_config
       run: |
@@ -198,37 +197,35 @@ jobs:
         else
           echo "config_available=false" >> $GITHUB_OUTPUT
         fi
-    
+
     - name: Set up kubectl
       if: steps.check_config.outputs.config_available == 'true'
       uses: azure/setup-kubectl@v3
-    
+
     - name: Configure kubectl
       if: steps.check_config.outputs.config_available == 'true'
       run: |
         echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
         echo "KUBECONFIG=$(pwd)/kubeconfig.yaml" >> $GITHUB_ENV
-    
+
     - name: Deploy to Kubernetes
       if: steps.check_config.outputs.config_available == 'true'
       run: |
         kubectl apply -f k8s/
         kubectl rollout status deployment/ai-security-app -n ai-security
-    
+
     - name: Verify deployment
       if: steps.check_config.outputs.config_available == 'true'
       run: |
         kubectl get pods -n ai-security
         kubectl get services -n ai-security
-    
+
     - name: Run smoke tests
       if: steps.check_config.outputs.config_available == 'true'
       run: |
-        # Wait for deployment to be ready
         sleep 30
-        # Add smoke test commands here
         curl -f https://yourdomain.com/health/live || exit 1
-    
+
     - name: Skip deployment (secrets not configured)
       if: steps.check_config.outputs.config_available == 'false'
       run: |
@@ -240,26 +237,25 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, deploy]
     if: always()
-    
     steps:
     - name: Check pipeline status
       run: |
         echo "Pipeline Status:"
         echo "Build: ${{ needs.build.result }}"
         echo "Deploy: ${{ needs.deploy.result }}"
-    
+
     - name: Send notification
       run: |
         if [ "${{ needs.build.result }}" = "success" ]; then
-          echo "✅ Build succeeded"
+          echo " Build succeeded"
           if [ "${{ needs.deploy.result }}" = "success" ]; then
-            echo "✅ Deployment succeeded"
+            echo " Deployment succeeded"
           elif [ "${{ needs.deploy.result }}" = "skipped" ]; then
-            echo "⏭️  Deployment skipped (secrets not configured)"
+            echo "  Deployment skipped (secrets not configured)"
           else
-            echo "❌ Deployment failed"
+            echo " Deployment failed"
           fi
         else
-          echo "❌ Build failed"
+          echo " Build failed"
         fi
         # Add Slack/Discord/Email notification here
