@@ -5,7 +5,7 @@
 ![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green?logo=fastapi)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
-![CI](https://github.com/SabarishR08/llm-prompt-security-middleware/actions/workflows/ci.yml/badge.svg)
+![CI/CD](https://github.com/SabarishR08/llm-prompt-security-middleware/actions/workflows/ci-cd.yml/badge.svg)
 ![Tests](https://img.shields.io/badge/Tests-20%20Passing-brightgreen)
 
 A security middleware for LLM applications that analyzes prompts for **PII**, **toxicity**, **prompt injection**, and other threats before reaching AI models.
