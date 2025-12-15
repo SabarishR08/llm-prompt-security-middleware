@@ -1,16 +1,20 @@
 # 🏗️ System Architecture
 
+This document describes the **design, data flow, and security architecture** of the **LLM Prompt Security Middleware**. The architecture is designed with a **defense-in-depth** approach and reflects the **actual implementation and reference deployment patterns** used in this project.
+
+---
+
 ## High-Level Architecture
 
 ```mermaid
 flowchart TD
-       A[User Prompt] --> B[JWT Auth]
+       A[User Prompt] --> B[JWT Authentication]
        B --> C[Compliance Checks<br/>PII, Toxicity, Injection, Profanity]
-       C --> D[Threat Intel APIs<br/>VirusTotal, GSB, OTX]
-       D --> E{Decision}
-       E -->|Pass| F[Gemini API<br/>Safe Response]
-       E -->|Block| G[Return 403<br/>+ reason]
-       E -->|Flag| H[Review Queue]
+       C --> D[Threat Intelligence APIs<br/>VirusTotal, GSB, OTX]
+       D --> E{Decision Engine}
+       E -->|Pass| F[Gemini API<br/>Safety-filtered Response]
+       E -->|Block| G[403 Response<br/>With Reason]
+       E -->|Flag| H[Manual Review / Audit]
        F --> I[Audit Log]
        G --> I
        H --> I
@@ -18,14 +22,14 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Clients[External Clients<br/>Web, Mobile, APIs] --> Nginx[NGINX Reverse Proxy<br/>TLS, rate limit, load balance]
-    Nginx --> Ingress[Kubernetes Ingress<br/>cert-manager, path routing]
-    Ingress --> Svc[Kubernetes Service<br/>ClusterIP LB]
-    Svc --> Pod1[App Pod 1<br/>Gunicorn workers]
-    Svc --> Pod2[App Pod 2<br/>Gunicorn workers]
-    Svc --> Pod3[App Pod 3<br/>Gunicorn workers]
-    Pod1 --> PG[PostgreSQL<br/>Logs, Users, Analytics]
-    Pod2 --> Redis[Redis Cache<br/>Rate limit, threat intel cache]
+    Clients[External Clients<br/>Web, Mobile, APIs] --> Nginx[NGINX Reverse Proxy<br/>TLS, Rate Limiting]
+    Nginx --> Ingress[Kubernetes Ingress<br/>Path Routing]
+    Ingress --> Svc[Kubernetes Service]
+    Svc --> Pod1[App Pod]
+    Svc --> Pod2[App Pod]
+    Svc --> Pod3[App Pod]
+    Pod1 --> PG[PostgreSQL<br/>Audit Logs, Users]
+    Pod2 --> Redis[Redis Cache<br/>Rate Limits, Intel Cache]
     Pod3 --> PG
 ```
 
@@ -35,14 +39,14 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[FastAPI Application] --> B[Middleware Stack<br/>RequestID, Performance, SecurityHeaders, RateLimit, CORS]
-    B --> C[API Routes<br/>Health, Auth, Analysis, Logs, Dashboard]
-    C --> D[Input Validation<br/>Pydantic Models]
-    D --> E[Business Logic<br/>Gemini Service, Prompt Detector, Threat Intel]
-    E --> F[Support Services<br/>Alerts, Auth Utils]
-    F --> G[Exception Handling]
+    A[FastAPI Application] --> B[Middleware Stack<br/>Request ID, Security Headers, Rate Limiting, CORS]
+    B --> C[API Routes<br/>Health, Auth, Analysis, Logs]
+    C --> D[Input Validation<br/>Pydantic Schemas]
+    D --> E[Business Logic<br/>Prompt Detector, Threat Intel, Gemini Service]
+    E --> F[Authentication Utilities]
+    F --> G[Centralized Exception Handling]
     G --> H[Configuration Layer]
-    H --> I[Logging System]
+    H --> I[Structured Logging System]
 ```
 
 ---
@@ -55,18 +59,15 @@ sequenceDiagram
     participant N as Nginx/Ingress
     participant M as Middleware
     participant R as Analysis Router
-    participant S as Services
-    participant DB as Redis/DB
-    participant A as Alerts
+    participant S as Core Services
+    participant DB as Redis / PostgreSQL
 
     C->>N: HTTPS POST /api/analyze
     N->>M: Forward request
-    M->>M: RequestID, Performance, SecurityHeaders, RateLimit, CORS
-    M->>R: Route to /api/analyze
-    R->>S: Validate request + run detectors
-    S->>DB: Cache lookup (Redis)
-    S->>DB: Log + analytics (PostgreSQL)
-    S->>A: Alert on high severity
+    M->>M: Request ID, Rate Limit, Headers
+    M->>R: Route to analysis endpoint
+    R->>S: Validate input & run detectors
+    S->>DB: Cache lookup / audit log
     S-->>C: JSON response
 ```
 
@@ -76,107 +77,111 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    A[External Data Sources<br/>Gemini, VirusTotal, Safe Browsing] --> B[FastAPI Application Layer]
-    B --> C[Service Orchestration<br/>Gemini Service, Threat Intel, Prompt Detector]
+    A[External Services<br/>Gemini, VirusTotal, Safe Browsing] --> B[FastAPI Application]
+    B --> C[Service Orchestration Layer]
     C --> D[Response Builder]
     C --> E[Redis Cache]
-    C --> F[PostgreSQL<br/>Logs, Users, Alerts]
+    C --> F[PostgreSQL<br/>Audit Logs]
     E --> D
-    F --> G[Analytics & Dashboard]
-    D --> H[API Response]
+    D --> G[API Response]
 ```
 
 ---
 
-## Security Layers
+## Security Layers (Defense in Depth)
 
 ```mermaid
 flowchart TD
-    L1[Network Security<br/>Firewall, TLS 1.2+, DDoS protection, IP allowlist] --> L2
-    L2[Application Gateway<br/>Nginx rate limits, request size caps, TLS termination, headers] --> L3
-    L3[Middleware Security<br/>RateLimit, SecurityHeaders, CORS, Request ID] --> L4
-    L4[Auth & Authz<br/>JWT validation, bcrypt, RBAC, token expiry] --> L5
-    L5[Input Validation<br/>Pydantic schemas, SQLi prevention, XSS escape, prompt detection] --> L6
-    L6[Business Logic Security<br/>AI safety checks, threat intel, PII masking, toxicity filtering] --> L7
-    L7[Data Security<br/>Encryption at rest/in transit, secrets management, audit logging] --> L8
-    L8[Monitoring & Alerting<br/>Threat detection, logs, multi-channel alerts, anomaly detection]
+    L1[Network Layer<br/>TLS Termination, Reverse Proxy Protections] --> L2
+    L2[Gateway Layer<br/>NGINX Rate Limits, Request Size Caps] --> L3
+    L3[Middleware Security<br/>Security Headers, CORS, Request ID] --> L4
+    L4[Authentication & Authorization<br/>JWT, RBAC, Token Expiry] --> L5
+    L5[Input Validation<br/>Pydantic Schemas, Injection Detection] --> L6
+    L6[Business Logic Security<br/>PII Masking, Toxicity Filtering, Threat Intel] --> L7
+    L7[Data Protection<br/>Secrets Management, Audit Logging]
 ```
 
 ---
 
 ## Deployment Architecture
 
-### Docker Compose (Development/Small Production)
+### Docker Compose (Development / Small-Scale Deployment)
 
 ```mermaid
 flowchart TB
-    Host[Docker Host] --> Net[Docker Network<br/>ai-security-network]
-    Net --> Nginx[nginx container<br/>ports 80, 443]
-    Net --> App[FastAPI app container<br/>Gunicorn x4, health checks]
-    Net --> PG[PostgreSQL container<br/>port 5432, volume postgres_data]
-    Net --> Redis[Redis container<br/>port 6379, volume redis_data]
-    App -. logs bind .-> Logs[Host ./logs]
-    PG --> V1[postgres_data volume]
-    Redis --> V2[redis_data volume]
+    Host[Docker Host] --> Net[Docker Network]
+    Net --> Nginx[nginx Container]
+    Net --> App[FastAPI App Container<br/>Gunicorn Workers]
+    Net --> PG[PostgreSQL Container]
+    Net --> Redis[Redis Container]
+    App -. logs .-> Logs[Host Logs Directory]
 ```
 
-### Kubernetes (Enterprise Production)
+### Kubernetes (Scalable Production Reference)
 
 ```mermaid
 flowchart TB
-    Ingress[Ingress Controller<br/>cert-manager, rate limits, path routing] --> Svc[Service: ai-security-service<br/>ClusterIP LB]
-    Svc --> P1[Pod 1<br/>App, 512Mi, 250m]
-    Svc --> P2[Pod 2<br/>App, 512Mi, 250m]
-    Svc --> P3[Pod 3<br/>App, 512Mi, 250m]
-    Svc --> HPA[HPA<br/>min 3, max 10, CPU 70%, Mem 80%]
-    Svc --> CM[ConfigMap<br/>env + config]
-    Svc --> Secret[Secret<br/>DB creds, API keys, JWT]
+    Ingress[Ingress Controller] --> Svc[Application Service]
+    Svc --> P1[Application Pod]
+    Svc --> P2[Application Pod]
+    Svc --> P3[Application Pod]
+    Svc --> HPA[Horizontal Pod Autoscaler]
+    Svc --> CM[ConfigMap]
+    Svc --> Secret[Secrets]
     P1 --> PG[Managed PostgreSQL]
     P2 --> Redis[Managed Redis]
     P3 --> PG
 ```
 
+> **Note:** Kubernetes deployment is provided as a **reference architecture** demonstrating scalability and security best practices.
+
 ---
 
 ## Technology Stack Summary
 
-**Backend:**
-- FastAPI 0.115.0 (Modern async web framework)
-- Gunicorn 23.0.0 (WSGI server)
-- Uvicorn 0.32.1 (ASGI server)
-- Pydantic 2.10.3 (Data validation)
+### Backend
 
-**Database:**
-- PostgreSQL 15+ (Relational database)
-- SQLAlchemy 2.0.36 (ORM)
-- Alembic 1.14.0 (Migrations)
+* FastAPI (Async API framework)
+* Gunicorn + Uvicorn (ASGI/WSGI servers)
+* Pydantic (Request & response validation)
 
-**Caching:**
-- Redis 7+ (In-memory cache)
-- hiredis 3.0.0 (Performance optimization)
+### Database & Storage
 
-**Security:**
-- PyJWT 2.10.1 (Token management)
-- bcrypt 5.0.0 (Password hashing)
-- python-jose 3.3.0 (Cryptography)
+* PostgreSQL (Audit logs, user data)
+* SQLAlchemy (ORM)
+* Alembic (Schema migrations)
 
-**AI & NLP:**
-- Google Generative AI 0.8.3 (Gemini API)
-- tiktoken 0.8.0 (Token counting)
+### Caching
 
-**Monitoring:**
-- psutil 6.1.0 (System metrics)
-- python-json-logger 3.2.1 (Structured logging)
-- Sentry SDK 2.19.2 (Error tracking)
+* Redis (Rate limiting, threat intel caching)
 
-**Infrastructure:**
-- Docker (Containerization)
-- Kubernetes (Orchestration)
-- Nginx (Reverse proxy)
+### Security
 
-**CI/CD:**
-- GitHub Actions (Automation)
-- Trivy (Vulnerability scanning)
-- Bandit (Security analysis)
+* JWT (Authentication & RBAC)
+* bcrypt (Password hashing)
+* python-jose / PyJWT (Token cryptography)
+
+### AI & NLP
+
+* Google Gemini API (LLM integration)
+* Token counting & prompt analysis utilities
+
+### Observability
+
+* Structured JSON logging
+* Error tracking (Sentry-compatible)
+
+### Infrastructure
+
+* Docker (Containerization)
+* Kubernetes (Orchestration – reference)
+* NGINX (Reverse proxy)
+
+### CI/CD & Security Tooling
+
+* GitHub Actions (CI/CD automation)
+* Bandit (Static security analysis)
+* Trivy (Container & dependency scanning)
 
 ---
+
