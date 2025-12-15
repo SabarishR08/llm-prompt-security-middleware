@@ -1,12 +1,13 @@
-# 🛡️ LLM Prompt Security Middleware
+#  LLM Prompt Security Middleware
 
 **AI Safety Gateway for Large Language Model Prompts**
 
-![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green?logo=fastapi)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![CI/CD](https://github.com/SabarishR08/llm-prompt-security-middleware/actions/workflows/ci-cd.yml/badge.svg)
-![Tests](https://img.shields.io/badge/Tests-20%20Passing-brightgreen)
+![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)
+
 
 A security middleware for LLM applications that analyzes prompts for **PII**, **toxicity**, **prompt injection**, and other threats before reaching AI models.
 
@@ -26,17 +27,17 @@ Only safe, compliant prompts reach the LLM. Everything is logged for audit trail
 
 ---
 
-## ✨ Core Features
+##  Core Features
 
 | Feature | Description | Status |
 |---------|-------------|--------|
-| 🔍 **PII Detection** | Presidio-based NER for sensitive data | ✅ Active |
-| 😤 **Toxicity Scoring** | Detoxify ML model (0.0-1.0 scores) | ✅ Active |
-| 💉 **Injection Prevention** | Regex + heuristics for attacks | ✅ Active |
-| 🌐 **Threat Intelligence** | VirusTotal, GSB, OTX integration | ✅ Active |
-| 👥 **RBAC** | Admin, Moderator, User roles (JWT) | ✅ Active |
-| 📝 **Audit Logging** | SQLite DB with full request tracking | ✅ Active |
-| 🤖 **LLM Integration** | Google Gemini API with safety filters | ✅ Active |
+|  **PII Detection** | Presidio-based NER for sensitive data |  Active |
+|  **Toxicity Scoring** | Detoxify ML model (0.0-1.0 scores) |  Active |
+|  **Injection Prevention** | Regex + heuristics for attacks |  Active |
+|  **Threat Intelligence** | VirusTotal, GSB, OTX integration |  Active |
+|  **RBAC** | Admin, Moderator, User roles (JWT) |  Active |
+|  **Audit Logging** | SQLite DB with full request tracking |  Active |
+|  **LLM Integration** | Google Gemini API with safety filters |  Active |
 
 ---
 
@@ -174,8 +175,7 @@ llm-prompt-security-middleware/
 │
 ├── docs/                     # Documentation
 │   ├── ARCHITECTURE.md
-│   ├── DEPLOYMENT_GUIDE.md
-│   └── RBAC_GUIDE.md
+│   └── DEPLOYMENT_GUIDE.md
 │
 └── frontend/                 # Web UI
     └── templates/
@@ -203,13 +203,14 @@ llm-prompt-security-middleware/
 
 ---
 
-## 📈 Performance
+## 📈 Performance (Local Testing)
 
-| Metric | Value |
-|--------|-------|
-| **Average Latency** | 45ms (P50) |
-| **Throughput** | 1,200 req/s |
-| **Test Coverage** | 20/20 passing |
+| Metric | Observation |
+|------|-------------|
+| Average Latency | ~40–60ms (local testing) |
+| Throughput | Suitable for concurrent requests |
+| Test Coverage | All security tests passing |
+
 
 ---
 
@@ -255,7 +256,6 @@ JWT_SECRET_KEY=your-secret-key-min-32-chars
 |----------|---------|
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design & data flow |
 | [DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) | Production deployment |
-| [RBAC_GUIDE.md](docs/RBAC_GUIDE.md) | Access control setup |
 | [QUICK_START.md](docs/QUICK_START.md) | Getting started guide |
 
 ---
