@@ -64,6 +64,5 @@ Detailed setup instructions are provided in **`QUICK_START.md`** and
 
 ## 📚 Related Documentation
 - **`ARCHITECTURE.md`** – System design and diagrams
-- **`RBAC_GUIDE.md`** – Access control model
 - **`QUICK_START.md`** – Getting started
 - **`DEPLOYMENT_GUIDE.md`** – Production deployment
