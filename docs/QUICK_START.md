@@ -186,8 +186,6 @@ pip install -r requirements.txt
 For full implementation details, see:
 - **`IMPLEMENTATION_SUMMARY.md`** - Complete feature documentation
 - **`PROJECT_DOCUMENTATION.md`** - Original project docs
-- **`RBAC_GUIDE.md`** - Role-based access control guide
-
 
 
 ---
