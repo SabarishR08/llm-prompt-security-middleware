@@ -32,7 +32,7 @@ The system follows a modular, service-oriented architecture built on FastAPI.
 Security checks are applied through middleware and service layers before requests
 reach AI analysis components.
 
-Detailed diagrams and component flow are available in **ARCHITECTURE.md**.
+Detailed diagrams and component flow are available in **`ARCHITECTURE.md`**.
 
 ---
 
@@ -57,13 +57,13 @@ The system supports multiple deployment models:
 - Containerized deployment using Docker
 - Scalable production deployment using Kubernetes
 
-Detailed setup instructions are provided in **QUICK_START.md** and
-**DEPLOYMENT_GUIDE.md**.
+Detailed setup instructions are provided in **`QUICK_START.md`** and
+**`DEPLOYMENT_GUIDE.md`**.
 
 ---
 
 ## 📚 Related Documentation
-- **ARCHITECTURE.md** – System design and diagrams
-- **RBAC_GUIDE.md** – Access control model
-- **QUICK_START.md** – Getting started
-- **DEPLOYMENT_GUIDE.md** – Production deployment
+- **`ARCHITECTURE.md`** – System design and diagrams
+- **`RBAC_GUIDE.md`** – Access control model
+- **`QUICK_START.md`** – Getting started
+- **`DEPLOYMENT_GUIDE.md`** – Production deployment
