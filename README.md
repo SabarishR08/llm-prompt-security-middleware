@@ -1,4 +1,84 @@
-#  LLM Prompt Security Middleware
+# Llm Prompt Security Middleware
+
+![License](https://img.shields.io/badge/license-MIT-green) ![Language](https://img.shields.io/badge/language-Python-informational) ![Docker](https://img.shields.io/badge/docker-ready-2496ed)
+
+
+## 📌 Overview
+
+Middleware for LLM Security, Prompt Sanitization, and Data Privacy Compliance.  Detects and redacts PII, sensitive data, prompt injection, profanity, toxicity,  policy violations, and unsafe user input before it reaches an LLM.
+
+## 🏗️ Architecture
+
+```text
+Browser / UI
+     │   HTTP
+     ▼
+FastAPI, WebSockets (Flask-SocketIO) app (handlers: analysis_router, auth_router, dashboard_router, health_router, logs_router)
+     │
+     ├──▶ Services — alerts_service, gemini_service, google_safebrowsing_service, pii_service, profanity_service, prompt_injection_detector, …
+     ├──▶ Database — PostgreSQL
+     └──▶ External services — Google Gemini, VirusTotal, AbuseIPDB, email service, Google APIs, Google Safe Browsing · ML models — scikit-learn
+```
+
+## 🧰 Tech Stack
+
+- **Language:** Python
+- **Backend:** FastAPI, WebSockets (Flask-SocketIO)
+- **Database:** PostgreSQL
+- **ML:** scikit-learn
+- **Integrations:** Google Gemini, VirusTotal, AbuseIPDB, email service, Google APIs, Google Safe Browsing
+- **Deployment:** Docker container
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Python 3.10+
+- Docker (optional, for container runs)
+
+### 1. Clone
+
+```bash
+git clone https://github.com/SabarishR08/llm-prompt-security-middleware.git
+cd llm-prompt-security-middleware
+```
+
+### 2. Install dependencies
+
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 3. Configure environment
+
+```bash
+cp .env.example .env   # then fill in values
+```
+
+Environment variables used: `ENVIRONMENT`, `SECRET_KEY`, `JWT_SECRET_KEY`, `HOST`, `PORT`, `WORKERS`, `CORS_ORIGINS`, `RATE_LIMIT_ENABLED`, `RATE_LIMIT_REQUESTS`, `RATE_LIMIT_WINDOW`, `DATABASE_URL`, `DATABASE_POOL_SIZE`, `DATABASE_MAX_OVERFLOW`, `REDIS_URL`, `CACHE_TTL`, `LOG_LEVEL`, `LOG_FILE`, `SENTRY_DSN`, `ENABLE_METRICS`, `MAX_PROMPT_LENGTH`, `MAX_PROMPT_TOKENS`, `MAX_PAYLOAD_SIZE`, `GEMINI_API_KEY`, `VIRUSTOTAL_API_KEY`, `GOOGLE_SAFEBROWSING_API_KEY`, `ABUSEIPDB_API_KEY`, `ALERT_LEVEL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM_EMAIL`, `SMTP_TO_EMAIL`, `SENDGRID_API_KEY`, `SENDGRID_FROM_EMAIL`, `SENDGRID_TO_EMAIL`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`, `TWILIO_TO_NUMBER`.
+
+External services involved: Google Gemini, VirusTotal, AbuseIPDB, email service, Google APIs, Google Safe Browsing.
+
+### 4. Run
+
+```bash
+python app.py
+```
+
+```bash
+python main.py
+```
+
+### (Alternative) Run with Docker
+
+```bash
+docker compose up --build
+```
+
+
+---
 
 **AI Safety Gateway for Large Language Model Prompts**
 
@@ -302,3 +382,9 @@ MIT License - See [LICENSE](LICENSE) file
 ---
 
 *Last Updated: December 2025*
+
+---
+
+## 📄 License
+
+[MIT](LICENSE) — © 2026 Sabarish R.
